@@ -3,6 +3,7 @@ package com.example.td_20220502_googlemap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -11,8 +12,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.td_20220502_googlemap.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.model.Marker
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -40,6 +42,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        //2) on s’abonne  au clic sur la fenêtre d'un marker
+        mMap.setOnInfoWindowClickListener(this);
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
@@ -50,8 +54,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     fun afficher(view: View) {
         val lieu = LatLng(45.45, 4.50)
         mMap.addMarker(MarkerOptions().position(lieu).title("Marker in lyon"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
         //Pour obtenir une animation plutot qu’un saut on remplace
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(lieu));
+//        mMap.animateCamera(CameraUpdateFactory.newLatLng(lieu));
+
+    }
+
+    override fun onInfoWindowClick(marker: Marker) {
+        //3)Des que l'on clique sur le titre un toast va s'afficher
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show();
     }
 }
