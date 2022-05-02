@@ -25,9 +25,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private val LOCATION_REQ_CODE = 456
+    private lateinit var stations: ArrayList<Station>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        stations = arrayListOf()
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -44,7 +47,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                     ) && (ActivityCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED)){
+            ) != PackageManager.PERMISSION_GRANTED)
+        ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -78,7 +82,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
-        if (getLocation())  mMap.setMyLocationEnabled(true);
+        if (getLocation()) mMap.setMyLocationEnabled(true);
     }
 
     fun afficher(view: View) {
@@ -97,7 +101,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
     override fun getInfoWindow(marker: Marker): View? {
         // 1. Get tag
-        val station1=Station("Title", LatLng(45.45, 4.50),"Adresse")
+        val station1 = Station("Title", LatLng(45.45, 4.50), "Adresse")
 
         // 2. Inflate view and set title, address, and rating
         val view = LayoutInflater.from(applicationContext).inflate(
@@ -117,7 +121,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     }
 
     fun getLocation(): Boolean {
-        return  ((ActivityCompat.checkSelfPermission(
+        return ((ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
@@ -140,4 +144,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         }
     }
 
+    private fun addItems() {
+
+        // Set some lat/lng coordinates to start with.
+        var lat = 51.5145160
+        var lng = -0.1270060
+
+        // Add ten cluster items in close proximity, for purposes of this example.
+        for (i in 0..9) {
+            val offset = i / 60.0
+            lat += offset
+            lng += offset
+            val offsetItem =
+                stations.add(Station("Title $i", LatLng(lat, lng), "Adresse $i"))
+
+        }
+    }
+
+    private fun addMarkers(googleMap: GoogleMap) {
+        addItems()
+        stations.forEach { station ->
+            val marker = googleMap.addMarker(
+                MarkerOptions()
+                    .title(station.name)
+                    .position(station.latLng)
+
+            )
+            //On ajoute la station comme tag au marker pour l’afficher
+            marker?.tag = station
+        }
+    }
 }
