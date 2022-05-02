@@ -2,7 +2,9 @@ package com.example.td_20220502_googlemap
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -14,7 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.example.td_20220502_googlemap.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.Marker
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -44,6 +46,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         mMap = googleMap
         //2) on s’abonne  au clic sur la fenêtre d'un marker
         mMap.setOnInfoWindowClickListener(this);
+        //Créer sa propre fenêtre lors d'un clic sur un marker
+        mMap.setInfoWindowAdapter(this);
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
@@ -63,5 +67,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     override fun onInfoWindowClick(marker: Marker) {
         //3)Des que l'on clique sur le titre un toast va s'afficher
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    override fun getInfoWindow(marker: Marker): View? {
+        // 1. Get tag
+        val station1=Station("Title", LatLng(45.45, 4.50),"Adresse")
+
+        // 2. Inflate view and set title, address, and rating
+        val view = LayoutInflater.from(applicationContext).inflate(
+            R.layout.marker_layout, null
+        )
+        view.findViewById<TextView>(
+            R.id.text_view_title
+        ).text = station1.name
+        view.findViewById<TextView>(
+            R.id.text_view_address
+        ).text = station1.address
+        return view
+    }
+
+    override fun getInfoContents(p0: Marker): View? {
+        return null
     }
 }
