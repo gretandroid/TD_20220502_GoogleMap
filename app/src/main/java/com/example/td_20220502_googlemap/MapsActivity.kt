@@ -91,6 +91,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
         //Pour obtenir une animation plutot qu’un saut on remplace
 //        mMap.animateCamera(CameraUpdateFactory.newLatLng(lieu));
+        addMarkers(mMap)
 
     }
 
@@ -101,7 +102,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
     override fun getInfoWindow(marker: Marker): View? {
         // 1. Get tag
-        val station1 = Station("Title", LatLng(45.45, 4.50), "Adresse")
+        val station = marker?.tag as? Station ?: return null
 
         // 2. Inflate view and set title, address, and rating
         val view = LayoutInflater.from(applicationContext).inflate(
@@ -109,10 +110,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         )
         view.findViewById<TextView>(
             R.id.text_view_title
-        ).text = station1.name
+        ).text = station.name
         view.findViewById<TextView>(
             R.id.text_view_address
-        ).text = station1.address
+        ).text = station.address
         return view
     }
 
@@ -171,7 +172,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             )
             //On ajoute la station comme tag au marker pour l’afficher
-            marker?.tag = station
+            marker?.tag=station
         }
+//On definit la position de depart de la camera qui peut etre le point initial des poi
+        val position=LatLng(51.5145160, -0.1270060)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 }
