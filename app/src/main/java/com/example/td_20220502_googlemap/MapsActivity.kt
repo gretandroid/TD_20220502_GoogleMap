@@ -107,7 +107,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         if (location!=null){
             val position = LatLng(location.latitude, location.longitude)
             mMap.addMarker(MarkerOptions().position(position).title("Ma position"))
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+            // zoomLevel is set at 10 for a City-level view
+
+            val zoomLevel = 15f
+            // latLng contains the coordinates where the marker is added
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,zoomLevel))
+
             //Toast.makeText(this,location.longitude.toString()+" "+location.latitude.toString(),Toast.LENGTH_LONG).show()
         }
 
@@ -267,9 +272,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             marker?.tag = service
         }
 
-//On definit la position de depart de la camera qui peut etre le point initial des poi
-        val position=LatLng(48.59343582342353, 2.5773162739219613)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+//On definit la position de départ de la camera qui peut etre le point initial des poi
+        // Assma
+        //val position=LatLng(48.59343582342353, 2.5773162739219613)
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 
     private fun addClusteredMarkers(googleMap: GoogleMap) {
@@ -306,7 +312,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         googleMap.setOnCameraIdleListener {
             clusterManager.onCameraIdle()
         }
-        val position=LatLng(51.5145160, -0.1270060)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+        // Londres
+        //val position=LatLng(51.5145160, -0.1270060)
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 }

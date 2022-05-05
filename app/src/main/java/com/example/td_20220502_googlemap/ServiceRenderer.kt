@@ -44,4 +44,3 @@ class ServiceRenderer(
         marker.tag = clusterItem
     }
 }
-
