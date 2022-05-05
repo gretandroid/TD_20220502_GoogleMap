@@ -34,16 +34,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private lateinit var stations: ArrayList<Station>
     private lateinit var services: ArrayList<Service>
 
-    private val bicycleIcon: BitmapDescriptor by lazy {
+/*    private val bicycleIcon: BitmapDescriptor by lazy {
         val color = ContextCompat.getColor(this, R.color.purple_200)
         BitmapHelper.vectorToBitmap(this, R.drawable.ic_baseline_directions_bike_24, color)
-    }
+    }*/
 
     private val perfumeIcon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(this, R.color.black)
-        BitmapHelper.vectorToBitmap(this, R.drawable.perfume_icon, color)
+        //val color = ContextCompat.getColor(this, R.color.black)
+        BitmapHelper.vectorToBitmap(this, R.drawable.perfume_icon)
     }
 
+    private val shoesIcon: BitmapDescriptor by lazy {
+        //val color = ContextCompat.getColor(this, R.color.black)
+        BitmapHelper.vectorToBitmap(this, R.drawable.shoes_icon)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -194,16 +198,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private fun addItems() {
 
         // Set some lat/lng coordinates to start with.
-  /*      var lat = 51.5145160
-        var lng = -0.1270060
-
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (i in 0..9) {
-            val offset = i / 60.0
-            lat += offset
-            lng += offset
-            val offsetItem =
-                stations.add(Station("Station $i", LatLng(lat, lng), "Adresse $i"))*/
 
             val service1 = Service(
                 "Hamid parfum",
@@ -260,6 +254,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             //On ajoute la station comme tag au marker pour l’afficher
             marker?.tag=station
         }*/
+
 
         services.forEach { service ->
             val marker = googleMap.addMarker(

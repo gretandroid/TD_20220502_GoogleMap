@@ -18,33 +18,33 @@ class StationRenderer(
     /**
      * The icon to use for each cluster item
      */
-    private val bicycleIcon: BitmapDescriptor by lazy {
+/*    private val bicycleIcon: BitmapDescriptor by lazy {
         val color = ContextCompat.getColor(context, R.color.purple_200)
         BitmapHelper.vectorToBitmap(
             context,
             R.drawable.ic_baseline_directions_bike_24,
             color
         )
-    }
+    }*/
 
     /**
      * Method called before the cluster item (the marker) is rendered.
      * This is where marker options should be set.
      */
-    override fun onBeforeClusterItemRendered(
+/*    override fun onBeforeClusterItemRendered(
         item: Station,
         markerOptions: MarkerOptions
     ) {
         markerOptions.title(item.name)
             .position(item.latLng)
             .icon(bicycleIcon)
-    }
+    }*/
 
     /**
      * Method called right after the cluster item (the marker) is rendered.
      * This is where properties for the Marker object should be set.
      */
-    override fun onClusterItemRendered(clusterItem: Station, marker: Marker) {
+/*    override fun onClusterItemRendered(clusterItem: Station, marker: Marker) {
         marker.tag = clusterItem
-    }
+    }*/
 }

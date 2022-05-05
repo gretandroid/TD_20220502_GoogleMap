@@ -23,9 +23,7 @@ class ServiceRenderer(
         val color = ContextCompat.getColor(context, R.color.black)
         BitmapHelper.vectorToBitmap(
             context,
-            R.drawable.perfume_icon, color
-        )
-    }
+            R.drawable.perfume_icon)}
     /**
      * Method called before the cluster item (the marker) is rendered.
      * This is where marker options should be set.

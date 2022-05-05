@@ -18,5 +18,6 @@ data class Service(
 
     override fun getSnippet(): String =
         address
+
 }
 
