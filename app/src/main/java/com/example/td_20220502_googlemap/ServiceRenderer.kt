@@ -9,42 +9,39 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
-class StationRenderer(
+class ServiceRenderer(
     private val context: Context,
     map: GoogleMap,
-    clusterManager: ClusterManager<Station>
-) : DefaultClusterRenderer<Station>(context, map, clusterManager) {
+    clusterManager: ClusterManager<Service>
+): DefaultClusterRenderer<Service>(context, map, clusterManager) {
 
     /**
      * The icon to use for each cluster item
      */
-    private val bicycleIcon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(context, R.color.purple_200)
+
+    private val perfumeIcon: BitmapDescriptor by lazy {
+        val color = ContextCompat.getColor(context, R.color.black)
         BitmapHelper.vectorToBitmap(
             context,
-            R.drawable.ic_baseline_directions_bike_24,
-            color
+            R.drawable.perfume_icon, color
         )
     }
-
     /**
      * Method called before the cluster item (the marker) is rendered.
      * This is where marker options should be set.
      */
-    override fun onBeforeClusterItemRendered(
-        item: Station,
-        markerOptions: MarkerOptions
-    ) {
+    override fun onBeforeClusterItemRendered(item: Service, markerOptions: MarkerOptions) {
         markerOptions.title(item.name)
             .position(item.latLng)
-            .icon(bicycleIcon)
+            .icon(perfumeIcon)
     }
 
     /**
      * Method called right after the cluster item (the marker) is rendered.
      * This is where properties for the Marker object should be set.
      */
-    override fun onClusterItemRendered(clusterItem: Station, marker: Marker) {
+    override fun onClusterItemRendered(clusterItem: Service, marker: Marker) {
         marker.tag = clusterItem
     }
 }
+

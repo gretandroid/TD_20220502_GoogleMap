@@ -32,16 +32,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private lateinit var binding: ActivityMapsBinding
     private val LOCATION_REQ_CODE = 456
     private lateinit var stations: ArrayList<Station>
+    private lateinit var services: ArrayList<Service>
 
     private val bicycleIcon: BitmapDescriptor by lazy {
         val color = ContextCompat.getColor(this, R.color.purple_200)
         BitmapHelper.vectorToBitmap(this, R.drawable.ic_baseline_directions_bike_24, color)
     }
 
+    private val perfumeIcon: BitmapDescriptor by lazy {
+        val color = ContextCompat.getColor(this, R.color.black)
+        BitmapHelper.vectorToBitmap(this, R.drawable.perfume_icon, color)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         stations = arrayListOf()
+
+        services = arrayListOf()
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -89,22 +97,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         mMap.setInfoWindowAdapter(this);
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+       // val sydney = LatLng(-34.0, 151.0)
+     //   mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+     //   mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        // Au démarrage, on affiche notre position actuelle
+        val locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val location=locationManager.getLastKnownLocation(locationManager.getBestProvider(Criteria(),true)!!)
+        if (location!=null){
+            val position = LatLng(location.latitude, location.longitude)
+            mMap.addMarker(MarkerOptions().position(position).title("Ma position"))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
+            //Toast.makeText(this,location.longitude.toString()+" "+location.latitude.toString(),Toast.LENGTH_LONG).show()
+        }
+
+
 
         if (getLocation()) mMap.setMyLocationEnabled(true);
     }
 
     @SuppressLint("MissingPermission")
     fun afficher(view: View) {
-        val lieu = LatLng(45.45, 4.50)
-        mMap.addMarker(MarkerOptions().position(lieu).title("Marker in lyon"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
+        //val lieu = LatLng(45.45, 4.50)
+        //mMap.addMarker(MarkerOptions().position(lieu).title("Marker in lyon"))
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
+
         //Pour obtenir une animation plutot qu’un saut on remplace
 //        mMap.animateCamera(CameraUpdateFactory.newLatLng(lieu));
 //        addMarkers(mMap)
+
         addClusteredMarkers(mMap)
+        /*
         if (!getLocation()) return
         val locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val location=locationManager.getLastKnownLocation(locationManager.getBestProvider(Criteria(),true)!!)
@@ -113,7 +136,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             mMap.addMarker(MarkerOptions().position(position).title("Ma position"))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
             Toast.makeText(this,location.longitude.toString()+" "+location.latitude.toString(),Toast.LENGTH_LONG).show()
-        }
+        }*/
 
     }
 
@@ -156,11 +179,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     }
 
     @SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (getLocation()) {
             if (mMap != null) mMap.isMyLocationEnabled = true
@@ -170,7 +189,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private fun addItems() {
 
         // Set some lat/lng coordinates to start with.
-        var lat = 51.5145160
+  /*      var lat = 51.5145160
         var lng = -0.1270060
 
         // Add ten cluster items in close proximity, for purposes of this example.
@@ -179,14 +198,53 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             lat += offset
             lng += offset
             val offsetItem =
-                stations.add(Station("Station $i", LatLng(lat, lng), "Adresse $i"))
+                stations.add(Station("Station $i", LatLng(lat, lng), "Adresse $i"))*/
+
+            val service1 = Service(
+                "Hamid parfum",
+                "Parfum",
+                "@hamid",
+                LatLng(48.595125, 2.582722),
+                "Savigny-le-Temple")
+            services.add(service1)
+
+            val service2 = Service(
+                "Collection Exclusive",
+                "Parfum",
+                "@co_exclu",
+                LatLng(48.652951, 2.395266),
+                "Grigny")
+            services.add(service2)
+
+            val service3 = Service(
+                "Nanou Parfums",
+                "Parfum",
+                "@nanou",
+                LatLng(48.881568, 2.375982),
+                "Paris")
+            services.add(service3)
+
+            val service4 = Service(
+                "Bob L'anyienss",
+                "Clothing",
+                "@boblanyienss",
+                LatLng(48.628814, 2.426340),
+                "Evry")
+            services.add(service4)
+
+            val service5 = Service(
+                "Clicli",
+                "Clothing",
+                "@clicli_puce",
+                LatLng(48.902010, 2.342847),
+                "Saint-Ouen")
+            services.add(service5)
 
         }
-    }
 
     private fun addMarkers(googleMap: GoogleMap) {
         addItems()
-        stations.forEach { station ->
+/*        stations.forEach { station ->
             val marker = googleMap.addMarker(
                 MarkerOptions()
                     .title(station.name)
@@ -196,25 +254,51 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             )
             //On ajoute la station comme tag au marker pour l’afficher
             marker?.tag=station
+        }*/
+
+        services.forEach { service ->
+            val marker = googleMap.addMarker(
+                MarkerOptions()
+                    .title(service.name)
+                    .position(service.latLng)
+                    .icon(perfumeIcon)
+            )
+            //On ajoute la station comme tag au marker pour l’afficher
+            marker?.tag = service
         }
+
 //On definit la position de depart de la camera qui peut etre le point initial des poi
-        val position=LatLng(51.5145160, -0.1270060)
+        val position=LatLng(48.59343582342353, 2.5773162739219613)
         mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 
     private fun addClusteredMarkers(googleMap: GoogleMap) {
         // Create the ClusterManager class and set the custom renderer.
-        val clusterManager = ClusterManager<Station>(this, googleMap)
+        /*val clusterManager = ClusterManager<Station>(this, googleMap)
         clusterManager.renderer =
             StationRenderer(
                 this,
                 googleMap,
                 clusterManager
+            )*/
+
+
+        val clusterManager = ClusterManager<Service>(this, googleMap)
+        clusterManager.renderer =
+            ServiceRenderer(
+                this,
+                googleMap,
+                clusterManager
             )
+
+
 
         // Add the places to the ClusterManager.
         addItems()
-        clusterManager.addItems(stations)
+
+        //clusterManager.addItems(stations)
+
+        clusterManager.addItems(services)
         clusterManager.cluster()
 
         // Set ClusterManager as the OnCameraIdleListener so that it
