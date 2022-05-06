@@ -10,11 +10,17 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="563dp"
+        android:layout_height="489dp"
         tools:context=".MapsActivity" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="RECHERCHER"
-        android:onClick="afficher"/>
+        android:onClick="afficher"
+        android:text="RECHERCHER" />
 </LinearLayout>

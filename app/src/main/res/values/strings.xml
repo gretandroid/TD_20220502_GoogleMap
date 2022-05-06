@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TD_20220502_GoogleMap</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="selected_item">Selected item:</string>
 
 
     <string-array name="Categories">
