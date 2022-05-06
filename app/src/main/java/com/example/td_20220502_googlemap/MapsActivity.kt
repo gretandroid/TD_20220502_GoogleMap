@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Criteria
 import android.location.LocationManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,6 +25,8 @@ import com.example.td_20220502_googlemap.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
+import kotlin.math.max
+import kotlin.math.min
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.InfoWindowAdapter {
 
@@ -33,10 +36,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     private lateinit var stations: ArrayList<Station>
     private lateinit var services: ArrayList<Service>
 
-/*    private val bicycleIcon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(this, R.color.purple_200)
-        BitmapHelper.vectorToBitmap(this, R.drawable.ic_baseline_directions_bike_24, color)
-    }*/
+    private lateinit var servicesFilteredList: ArrayList<Service>
+    lateinit var clusterManager: ClusterManager<Service>
+
+    var xMin = -180.0
+    var xMax = 180.0
+    var yMin = -90.0
+    var yMax = 90.0
+
 
     private val perfumeIcon: BitmapDescriptor by lazy {
         //val color = ContextCompat.getColor(this, R.color.black)
@@ -50,9 +57,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        stations = arrayListOf()
-
         services = arrayListOf()
+        servicesFilteredList = arrayListOf()
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -70,7 +76,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                                             view: View, position: Int, id: Long) {
                     Toast.makeText(this@MapsActivity,
                         getString(R.string.selected_item) + " " +
-                                "" + categories[position], Toast.LENGTH_SHORT).show()
+                                "" + categories[position], Toast.LENGTH_LONG).show()
+
+                    if (services.size > 0) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            servicesFilteredList.addAll(services)
+                            servicesFilteredList.removeIf { it.category != categories[position] }
+                            addClusteredMarkers(mMap)
+
+                        }
+                    }
+
+                    Toast.makeText(
+                        this@MapsActivity,
+                        "Texte du toast "+ services.size + " " + servicesFilteredList.size,
+                        Toast.LENGTH_LONG).show()
+
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -78,7 +99,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 }
             }
         }
-
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -101,7 +121,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
                 ), LOCATION_REQ_CODE
-            );
+            )
         }
 
     }
@@ -118,10 +138,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        // [Pour le lateinit]
+        clusterManager = ClusterManager<Service>(this, mMap)
+
         //2) on s’abonne  au clic sur la fenêtre d'un marker
-        mMap.setOnInfoWindowClickListener(this);
+        mMap.setOnInfoWindowClickListener(this)
         //Créer sa propre fenêtre lors d'un clic sur un marker
-        mMap.setInfoWindowAdapter(this);
+        mMap.setInfoWindowAdapter(this)
 
         // Add a marker in Sydney and move the camera
        // val sydney = LatLng(-34.0, 151.0)
@@ -139,10 +162,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             val zoomLevel = 10f
             // latLng contains the coordinates where the marker is added
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,zoomLevel))
-
+            addItems()
             //Toast.makeText(this,location.longitude.toString()+" "+location.latitude.toString(),Toast.LENGTH_LONG).show()
         }
-
 
 
         if (getLocation()) mMap.setMyLocationEnabled(true);
@@ -150,31 +172,48 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
     @SuppressLint("MissingPermission")
     fun afficher(view: View) {
-        //val lieu = LatLng(45.45, 4.50)
-        //mMap.addMarker(MarkerOptions().position(lieu).title("Marker in lyon"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(lieu))
 
         //Pour obtenir une animation plutot qu’un saut on remplace
 //        mMap.animateCamera(CameraUpdateFactory.newLatLng(lieu));
 //        addMarkers(mMap)
 
         addClusteredMarkers(mMap)
-        /*
-        if (!getLocation()) return
-        val locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val location=locationManager.getLastKnownLocation(locationManager.getBestProvider(Criteria(),true)!!)
-        if (location!=null){
-            val position = LatLng(location.latitude, location.longitude)
-            mMap.addMarker(MarkerOptions().position(position).title("Ma position"))
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
-            Toast.makeText(this,location.longitude.toString()+" "+location.latitude.toString(),Toast.LENGTH_LONG).show()
-        }*/
+        clusterManager.clearItems()
+
+    }
+    @SuppressLint("MissingPermission")
+    fun afficher_tout(view: View) {
+
+        val googleMap = mMap
+        clusterManager.renderer =
+            ServiceRenderer(
+                this,
+                googleMap,
+                clusterManager
+            )
+
+        //[clearing the items]
+        clusterManager.clearItems()
+
+        clusterManager.addItems(services)
+        clusterManager.cluster()
+
+        // Set ClusterManager as the OnCameraIdleListener so that it
+        // can re-cluster when zooming in and out.
+        googleMap.setOnCameraIdleListener {
+            clusterManager.onCameraIdle()
+        }
+        // TODO : corriger deplacement map pour l'affichage de tous les points
+        setXYMinAndMax()
+        //val position2=LatLng((xMin+xMax)/2, (yMin+yMax)/2)
+        //mMap.moveCamera(CameraUpdateFactory.newLatLng(position2))
+        //Toast.makeText(this, "xmin et max : "+xMin + " " + xMax,Toast.LENGTH_LONG).show()
 
     }
 
     override fun onInfoWindowClick(marker: Marker) {
         //3)Des que l'on clique sur le titre un toast va s'afficher
-        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show()
     }
 
     /*override fun getInfoWindow(marker: Marker): View? {
@@ -241,7 +280,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             val service1 = Service(
                 "Hamid parfum",
-                "Parfum",
+                //"Parfum",
+                getString(R.string.PARFUM),
                 "@hamid",
                 LatLng(48.595125, 2.582722),
                 "Savigny-le-Temple",
@@ -250,7 +290,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             val service2 = Service(
                 "Collection Exclusive",
-                "Parfum",
+                getString(R.string.PARFUM),
                 "@co_exclu",
                 LatLng(48.652951, 2.395266),
                 "Grigny",
@@ -259,7 +299,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             val service3 = Service(
                 "Nanou Parfums",
-                "Parfum",
+                getString(R.string.PARFUM),
                 "@nanou",
                 LatLng(48.881568, 2.375982),
                 "Paris",
@@ -268,7 +308,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             val service4 = Service(
                 "Bob L'anyienss",
-                "Clothing",
+                //"Prêt-à-porter",
+                getString(R.string.PRET_A_PORTER),
                 "@boblanyienss",
                 LatLng(48.628814, 2.426340),
                 "Evry",
@@ -277,7 +318,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
 
             val service5 = Service(
                 "Clicli",
-                "Clothing",
+                getString(R.string.PRET_A_PORTER),
                 "@clicli_puce",
                 LatLng(48.902010, 2.342847),
                 "Saint-Ouen",
@@ -285,11 +326,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             services.add(service5)
 
         }
-
     private fun addMarkers(googleMap: GoogleMap) {
         addItems()
 
-        services.forEach { service ->
+        servicesFilteredList.forEach { service ->
             val marker = googleMap.addMarker(
                 MarkerOptions()
                     .title(service.name)
@@ -302,23 +342,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         }
 
 //On definit la position de départ de la camera qui peut etre le point initial des poi
-        // Assma
         //val position=LatLng(48.59343582342353, 2.5773162739219613)
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
 
     private fun addClusteredMarkers(googleMap: GoogleMap) {
-        // Create the ClusterManager class and set the custom renderer.
-        /*val clusterManager = ClusterManager<Station>(this, googleMap)
-        clusterManager.renderer =
-            StationRenderer(
-                this,
-                googleMap,
-                clusterManager
-            )*/
 
-
-        val clusterManager = ClusterManager<Service>(this, googleMap)
         clusterManager.renderer =
             ServiceRenderer(
                 this,
@@ -327,13 +356,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
             )
 
 
+        //New: clearing the items
+        clusterManager.clearItems()
 
-        // Add the places to the ClusterManager.
-        addItems()
-
-        //clusterManager.addItems(stations)
-
-        clusterManager.addItems(services)
+        clusterManager.addItems(servicesFilteredList)
         clusterManager.cluster()
 
         // Set ClusterManager as the OnCameraIdleListener so that it
@@ -345,4 +371,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         //val position=LatLng(51.5145160, -0.1270060)
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(position))
     }
-}
+
+    private fun setXYMinAndMax() {
+        if (services.size > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                xMin = services.get(0).latLng.longitude
+                xMax = xMin
+                yMin = services.get(0).latLng.latitude
+                yMax = yMin
+                for (i in services) {
+                    xMin = min(xMin, i.latLng.longitude)
+                    xMax = max(xMax, i.latLng.longitude)
+                    yMin = min(yMin, i.latLng.latitude)
+                    yMax = max(yMax, i.latLng.latitude)
+                }
+            }
+        }
+    }
+
+    }

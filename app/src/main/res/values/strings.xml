@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">TD_20220502_GoogleMap</string>
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="selected_item">Selected item:</string>
+    <string name="selected_item">Catégorie sélectionnée : </string>
+    <string name="PARFUM">Parfums</string>
+    <string name="PRET_A_PORTER">Prêt-à-porter</string>
 
 
     <string-array name="Categories">
-        <item>Perfume</item>
-        <item>Clothing</item>
+        <item>Parfums</item>
+        <item>Prêt-à-porter</item>
     </string-array>
 
 </resources>

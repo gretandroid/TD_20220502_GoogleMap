@@ -35,7 +35,11 @@ class ServiceRenderer(
      * This is where marker options should be set.
      */
     override fun onBeforeClusterItemRendered(item: Service, markerOptions: MarkerOptions) {
-        markerOptions.title(item.name)
+        markerOptions
+            //.title("@hamidoux")
+            //.title(item.name + " - " +"@hamidoux")
+            .title(item.name)
+            //.title(item.category)     // Ca ecrase parfum //TODO : trouver une autre facon de faire dans l'api
             .position(item.latLng)
             .icon(item.icon)
     }
