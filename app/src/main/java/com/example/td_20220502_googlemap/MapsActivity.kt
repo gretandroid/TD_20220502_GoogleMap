@@ -154,7 +154,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
-    override fun getInfoWindow(marker: Marker): View? {
+    /*override fun getInfoWindow(marker: Marker): View? {
         // 1. Get tag
         val station = marker?.tag as? Station ?: return null
 
@@ -168,6 +168,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         view.findViewById<TextView>(
             R.id.text_view_address
         ).text = station.address
+        return view
+    }*/
+
+    override fun getInfoWindow(marker: Marker): View? {
+        // 1. Get tag
+        val service = marker?.tag as? Service ?: return null
+
+        // 2. Inflate view and set title, address, and rating
+        val view = LayoutInflater.from(applicationContext).inflate(
+            R.layout.marker_layout, null
+        )
+        view.findViewById<TextView>(
+            R.id.text_view_title
+        ).text = service.name
+        view.findViewById<TextView>(
+            R.id.text_view_address
+        ).text = service.address
         return view
     }
 
@@ -204,7 +221,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Parfum",
                 "@hamid",
                 LatLng(48.595125, 2.582722),
-                "Savigny-le-Temple")
+                "Savigny-le-Temple",
+                perfumeIcon)
             services.add(service1)
 
             val service2 = Service(
@@ -212,7 +230,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Parfum",
                 "@co_exclu",
                 LatLng(48.652951, 2.395266),
-                "Grigny")
+                "Grigny",
+                perfumeIcon)
             services.add(service2)
 
             val service3 = Service(
@@ -220,7 +239,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Parfum",
                 "@nanou",
                 LatLng(48.881568, 2.375982),
-                "Paris")
+                "Paris",
+                perfumeIcon)
             services.add(service3)
 
             val service4 = Service(
@@ -228,7 +248,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Clothing",
                 "@boblanyienss",
                 LatLng(48.628814, 2.426340),
-                "Evry")
+                "Evry",
+                shoesIcon)
             services.add(service4)
 
             val service5 = Service(
@@ -236,34 +257,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Clothing",
                 "@clicli_puce",
                 LatLng(48.902010, 2.342847),
-                "Saint-Ouen")
+                "Saint-Ouen",
+                shoesIcon)
             services.add(service5)
 
         }
 
     private fun addMarkers(googleMap: GoogleMap) {
         addItems()
-/*        stations.forEach { station ->
-            val marker = googleMap.addMarker(
-                MarkerOptions()
-                    .title(station.name)
-                    .position(station.latLng)
-                    .icon(bicycleIcon)
-
-            )
-            //On ajoute la station comme tag au marker pour l’afficher
-            marker?.tag=station
-        }*/
-
 
         services.forEach { service ->
             val marker = googleMap.addMarker(
                 MarkerOptions()
                     .title(service.name)
                     .position(service.latLng)
-                    .icon(perfumeIcon)
+                    .icon(service.icon)
+
             )
-            //On ajoute la station comme tag au marker pour l’afficher
+            //On ajoute la service comme tag au marker pour l’afficher
             marker?.tag = service
         }
 

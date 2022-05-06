@@ -24,6 +24,12 @@ class ServiceRenderer(
         BitmapHelper.vectorToBitmap(
             context,
             R.drawable.perfume_icon)}
+
+    private val shoesIcon: BitmapDescriptor by lazy {
+        val color = ContextCompat.getColor(context, R.color.black)
+        BitmapHelper.vectorToBitmap(
+            context,
+            R.drawable.shoes_icon)}
     /**
      * Method called before the cluster item (the marker) is rendered.
      * This is where marker options should be set.
@@ -31,7 +37,7 @@ class ServiceRenderer(
     override fun onBeforeClusterItemRendered(item: Service, markerOptions: MarkerOptions) {
         markerOptions.title(item.name)
             .position(item.latLng)
-            .icon(perfumeIcon)
+            .icon(item.icon)
     }
 
     /**

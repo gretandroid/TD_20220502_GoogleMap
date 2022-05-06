@@ -1,5 +1,6 @@
 package com.example.td_20220502_googlemap
 
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem
 
@@ -8,7 +9,8 @@ data class Service(
     val category : String,
     val username : String,
     val latLng: LatLng,
-    val address: String
+    val address: String,
+    val icon: BitmapDescriptor
 ): ClusterItem {
     override fun getPosition(): LatLng =
         latLng
