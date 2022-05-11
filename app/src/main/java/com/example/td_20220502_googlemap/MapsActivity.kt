@@ -87,10 +87,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                         }
                     }
 
-                    Toast.makeText(
+   /*                 Toast.makeText(
                         this@MapsActivity,
                         "Texte du toast "+ services.size + " " + servicesFilteredList.size,
-                        Toast.LENGTH_LONG).show()
+                        Toast.LENGTH_LONG).show()*/
 
                 }
 
@@ -205,10 +205,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
         }
         // TODO : corriger deplacement map pour l'affichage de tous les points
         setXYMinAndMax()
-        //val position2=LatLng((xMin+xMax)/2, (yMin+yMax)/2)
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(position2))
+        val position2=LatLng((xMin+xMax)/2, (yMin+yMax)/2)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(position2))
         //Toast.makeText(this, "xmin et max : "+xMin + " " + xMax,Toast.LENGTH_LONG).show()
 
+
+        val locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val location=locationManager.getLastKnownLocation(locationManager.getBestProvider(Criteria(),true)!!)
+        if (location!=null){
+            val position = LatLng((location.latitude - 0.03), (location.longitude + 0.002))
+            //mMap.addMarker(MarkerOptions().position(position).title("Ma position"))
+            // zoomLevel is set at 10 for a City-level view
+
+            val zoomLevel = 10.8f
+            // latLng contains the coordinates where the marker is added
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,zoomLevel))
+        }
     }
 
     override fun onInfoWindowClick(marker: Marker) {
@@ -283,8 +295,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 //"Parfum",
                 getString(R.string.PARFUM),
                 "@hamid",
-                LatLng(48.595125, 2.582722),
-                "Savigny-le-Temple",
+                LatLng(48.816411, 2.348414),
+                "Paris",
                 perfumeIcon)
             services.add(service1)
 
@@ -292,8 +304,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 "Collection Exclusive",
                 getString(R.string.PARFUM),
                 "@co_exclu",
-                LatLng(48.652951, 2.395266),
-                "Grigny",
+                LatLng(48.822199, 2.424193),
+                "Vincennes",
                 perfumeIcon)
             services.add(service2)
 
@@ -311,8 +323,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWi
                 //"Prêt-à-porter",
                 getString(R.string.PRET_A_PORTER),
                 "@boblanyienss",
-                LatLng(48.628814, 2.426340),
-                "Evry",
+                LatLng(48.863074, 2.222484),
+                "Suresnes",
                 shoesIcon)
             services.add(service4)
 

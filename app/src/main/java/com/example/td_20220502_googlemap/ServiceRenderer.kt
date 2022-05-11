@@ -37,10 +37,11 @@ class ServiceRenderer(
     override fun onBeforeClusterItemRendered(item: Service, markerOptions: MarkerOptions) {
         markerOptions
             //.title("@hamidoux")
-            //.title(item.name + " - " +"@hamidoux")
-            .title(item.name)
+            .title(item.name + " - " + item.username)
+            //.title(item.name)
             //.title(item.category)     // Ca ecrase parfum //TODO : trouver une autre facon de faire dans l'api
             .position(item.latLng)
+            //.position(item.latLng)
             .icon(item.icon)
     }
 
